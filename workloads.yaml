@@ -1,0 +1,46 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: appointment-service
+spec:
+  selector:
+    app: appointment-service
+  type: NodePort
+  ports:
+    - name: http
+      port: 8080
+      nodePort: 31003
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: appointment-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: appointment-service
+  template:
+    metadata:
+      labels:
+        app: appointment-service
+    spec:
+      containers:
+        - env:
+            - name: DB_SERVER
+              value: mysqldb-polyclinic
+            - name: MYSQL_DATABASE
+              value: polyclinic
+            - name: MYSQL_USER
+              value: root
+            - name: MYSQL_PASSWORD
+              value: ""
+          image: nzakharchynn/appointment-service
+          name: appointment-service
+          ports:
+            - name: http
+              containerPort: 8080
+
+---
